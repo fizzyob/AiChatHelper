@@ -1,5 +1,6 @@
 // 导入所需的模块
 const express = require('express');
+const { exec } = require('child_process');
 const axios = require('axios');
 
 // 创建 Express 应用
@@ -189,6 +190,32 @@ async function processGeminiRequest(contents, res) {
         handleRetryableError(res, error, `Gemini请求出错: ${error.toString()}`, () => processGeminiRequest(contents, res));
     }
 }
+
+// 保持活动路由处理程序
+app.get('/keep-alive', (req, res) => {
+  // 执行命令以保持会话活动
+  exec('echo "保持活动"', (error, stdout, stderr) => {
+    if (error) {
+      console.error(`保持活动错误: ${error.message}`);
+      res.status(500).send('内部服务器错误');
+      return;
+    }
+    console.log(`保持活动响应: ${stdout}`);
+    res.send('保持活动成功');
+  });
+});
+
+// 设置定时器，每隔5分钟执行一次保持活动操作
+setInterval(() => {
+  // 直接调用保持活动处理程序
+  axios.get('http://localhost:3000/keep-alive')
+    .then(response => {
+      console.log('保持活动内部请求:', response.data);
+    })
+    .catch(error => {
+      console.error('保持活动内部请求错误:', error.message);
+    });
+}, 5 * 60 * 1000);
 
 // 启动 Express 应用
 app.listen(port, () => {
