@@ -1,44 +1,47 @@
-# 微信助手 ChatGPT 反向代理
+# 搭建ChatGPT、Gemini、通义千问反向代理
+only for 微信助手，突破gemini对区域的限制
 
-欢迎来到微信助手 ChatGPT 反向代理项目！这个仓库帮助你在 replit.com 上部署 ChatGPT / Gemini-pro 反向代理，使其能够与懒猫的微信助手插件的 ChatGPT 功能协同工作。
+欢迎来到微信助手 ChatGPT 反向代理项目！这个仓库帮助你部署 ChatGPT / Gemini-pro / 通义千问 反向代理，使其能够与懒猫的微信助手插件的 ChatGPT 功能协同工作。
+
+# 直接把微信助手的反代部署到Netlify！！！
+这个方案独立的，不需要用到Cloudflare即可实现3种AI模型的代理，同时没有gemini的区域限制（User location is not supported for the API use）。
 
 ## Fork 仓库
 
-1. 点击仓库右上角的 "Fork" 按钮，创建你自己的分支。
+1. 注册一个你自己的GitHub账户。
+2. 来到我这个仓库，点击仓库右上角的 "Fork" 按钮，创建你自己的分支。
 
-## 部署到 replit
+## 部署到 Netlify
 
-1. 注册[Replit 帐号](https://replit.com/)。
-2. 在 Replit 上创建一个新项目(Create Node.js)。
-3. 点击弹出的窗口右上角 "Import from GitHub" 。
-4. Connect your GitHub account-->Install&Authorize.
-5. 将你 Fork 的 GitHub 仓库连接到你的 Replit 项目，项目名任意。
-6. Replit 将自动检测到你的 Node.js 应用并设置必要的配置。
-
-## 设置环境变量
-
-1. 在 Replit 项目中，进入 "Tools" 选项卡。
-2. 找到 "Secrets" 部分。
-3. 添加以下环境变量(+ New Secret)：
-   - `MAX_RETRIES`：设置最大重试次数。选填项，不添加此变量则默认1，即可重试一次，也就是会执行 2 次。
-   - `WXID_ARRAY`：设置授权的 WXID 数组（微信ID，助手里面可以看到，不同 ID 必须以英文逗号分隔）。选填项，不添加此变量则默认为空，表示不进行授权验证。
-   - `CHATGPT_TEMPERATURE`：设置 ChatGPT 的温度。选填项，不添加此变量则默认为 1，从0开始，温度值越高，生成的文本越随机和创造性，而温度值越低，生成的文本越保守和可预测。
-
-## 运行应用
-
-1. 一旦项目设置完成，Replit 上的 "My Repls" 选项卡选择你刚刚创建的项目。
-2. 点击 "Run" 运行应用。
-3. 应用启动后，“Webview”选项卡点击“New tab”，会在默认浏览器打开新页面，复制它的网址链接，这就是代理服务器的地址，不需要加端口,末端不带/。例如 "https://一串乱码..replit.dev"
+1. 用邮箱注册[Netlify 帐号](https://app.netlify.com/signup/)。注意：netlify.com和netlify.app的分流规则都必须设置为直连不可用魔法。<img src="./images/rules_netlify.jpg" width="400px">
+2. 在 [Netlify](https://app.netlify.com) 上创建一个新Site(Add new site)。
+3. 点击弹出的窗口 "Import an existing project" 。
+4. Deploy with GitHub.
+5. 按提示授权 GitHub 到你的 Netlify。
+6. 选择你刚刚fork的项目
+7. "Add environment variables" 创建<B>WXID_ARRAY</B>这个环境变量（只创建一个，别重复），values值为：微信ID1,微信ID2,微信ID3 <br>
+---替换为你需要授权的微信ID，不同的ID需要用英文逗号隔开,最后一个微信ID后面不要加逗号。不需要加引号 <br>
+---如果你的微信ID是wxid_abcdefg,你就填写wxid_abcdefg,别删掉了'wxid_'; <br>
+---如果你的微信ID是lambous就填写lambous、开头别加‘wxid’！ <br>
+---以此类推可以添加很多不止三个的。比如 wxid_abcdefg,lambous,yourxxx) <br>
+8. Deploy AiChatHelper
+9. 等待部署完成，你将获得一个二级域名，这就是你的代理地址，记住它。（xxx.netlify.app；xxx可自定义，需要带上前缀https&#58;&#47;&#47;）
+10. 以后在GitHub修改你的代码，Netlity会自动更新代码并重新部署。
+11. 第7步的环境变量WXID_ARRAY是在初次部署之前填写的。如果部署成功后再次修改环境变量WXID_ARRAY的值，请重新部署。
+<img src="./images/deploySite.png" width="400px"><img src="./images/configure-builds-retry-deploy-dropdown.png" width="400px">
 
 ## 使用方法
 以下操作都是在“微信助手”ChatGPT中操作：
-1. 将你的代理地址填写到“代理地址”栏。
-2. 如果使用的是ChatGPT API，请和 “APIKey”中填写ChatGPT(Openai)的API Key，在“模型”中选择对应的gpt-4或者gpt-3.5-turbo。
-3. 如果使用的是Gemini-pro API，请和 “APIKey”中填写Gemini-pro的API Key，在“模型”中选择 手动输入 ，填写：Gemini 或者 Gemini-pro 。
+1. 将你的代理地址填写到“代理地址”栏。（https&#58;&#47;&#47;xxx.netlify.app）
+2. 如果使用的是ChatGPT API，请在 “APIKey”中填写ChatGPT(Openai)的API Key，在“模型”中选择对应的gpt-4或者gpt-3.5-turbo。
+3. 如果使用的是Gemini-pro API，请在 “APIKey”中填写Gemini-pro的API Key，在“模型”中选择 手动输入 ，填写：Gemini-pro (或填写简称Gemini)。
+4. 如果使用的是通义千问 API，请在 “APIKey”中填写Qwen的API Key，在“模型”中选择 手动输入 ，填写：qwen-turbo或qwen-max。
 
-## 其他注意事项
-- 代码修改自懒猫提供的Gemini.zip，[懒猫插件交流](https://t.me/maogroup)
-- 如果遇到任何问题，请参考[Replit 文档](https://docs.replit.com)进行故障排除。
+## 其他事项
+- 部分代码参考了懒猫提供的Gemini.zip，[懒猫插件交流](https://t.me/maogroup)
+- 部分代码参考了Simon's Blog：[simonmy.com](https://simonmy.com/posts/使用netlify反向代理google-palm-api.html)
+- 如果遇到任何问题，请参考[Netlify 文档](https://docs.netlify.com)进行故障排除。
 - 有关微信助手ChatGPT相关功能使用，请查看微信助手中的详细使用说明，或者在交流群里交流。
 
 祝你在微信助手中体验愉快！
+# 其他方案都不需要看了，就用此方案可以了。
