@@ -16,7 +16,7 @@ export default class GPT360 {
 
         try {
             // 获取最后一条消息
-            const lastMessage = requestMessages.messages[requestMessages.messages.length - 1].content.trim();
+            const lastMessage = requestMessages[requestMessages.length - 1].content.trim();
 
             // 判断是否需要文生图模式
             if (lastMessage.startsWith('画')) {
@@ -107,8 +107,12 @@ export default class GPT360 {
             }
         } else {
             // 文生图模式
-            if (responseData.status === 'success' && responseData.output && responseData.output.length > 0) {
-                return responseData.output[0];
+            if (responseData.status === 'success' && responseData.output) {
+                if (responseData.output.length > 0){
+                  return responseData.output[0];
+                } else {
+                  return '鉴于关键词过滤原因，无法根据您的关键词生图';
+                }
             } else {
                 return `${this.model}: 无法解析响应数据`;
             }
